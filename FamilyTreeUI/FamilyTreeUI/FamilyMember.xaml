@@ -1,0 +1,373 @@
+﻿<Window x:Class="FamilyTreeUI.FamilyMember"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:validation="clr-namespace:FamilyTreeUI.Validation"
+        xmlns:converters="clr-namespace:FamilyTreeUI.Converters"
+        mc:Ignorable="d"
+        Title="New member" Height="450" Width="600" ResizeMode="CanMinimize"  WindowStyle="SingleBorderWindow"
+        x:Name="Window">
+
+  <Window.Resources>
+    <DataTemplate x:Key="educationsInput">
+      <StackPanel Orientation="Horizontal">
+        <Button Style="{StaticResource MaterialDesignFloatingActionMiniButton}" Margin="0 5 10 5 "
+                Width="25" Height="25" VerticalAlignment="Bottom"
+                Command="{Binding Path=DataContext.DeleteUniversityCommand,
+                RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Window} }}"
+                CommandParameter="{Binding Path=Content, RelativeSource={RelativeSource Mode=TemplatedParent}}">
+          <materialDesign:PackIcon Kind="Delete"/>
+        </Button>
+
+        <ComboBox Width="100"
+                      ItemsSource="{Binding Path=DataContext.Countries, 
+                            RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}}"
+                      x:Name="burthCountriesDropdown" 
+                      DisplayMemberPath="Title"
+                      IsEditable="True" IsTextSearchEnabled="True"
+                      Margin="0 5 5 5"
+                      materialDesign:HintAssist.Hint="Страна"
+                      VerticalAlignment="Bottom"
+                      VirtualizingStackPanel.VirtualizationMode="Recycling" 
+                      VirtualizingStackPanel.IsVirtualizing="True" 
+                      >
+          <ComboBox.ItemsPanel>
+            <ItemsPanelTemplate>
+              <VirtualizingStackPanel/>
+            </ItemsPanelTemplate>
+          </ComboBox.ItemsPanel>
+        </ComboBox>
+        
+        <TextBox
+          materialDesign:HintAssist.Hint="Город"
+          Text="{Binding City}"
+          Margin="5 5 5 5"
+          Width="90"
+          VerticalAlignment="Bottom" OverridesDefaultStyle="True"/>
+
+        <TextBox
+          materialDesign:HintAssist.Hint="Учебное заведение"
+          Text="{Binding Title}"
+          Margin="5 5 5 5"
+          Width="170"
+          VerticalAlignment="Bottom" OverridesDefaultStyle="True"/>
+
+      </StackPanel>
+    </DataTemplate>
+    
+    <DataTemplate x:Key="residencceInput">
+      <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
+        <Button Style="{StaticResource MaterialDesignFloatingActionMiniButton}" Margin="0 5 10 5 "
+                Width="25" Height="25" VerticalAlignment="Bottom"
+                Command="{Binding Path=DataContext.DeleteResidenceCommand, 
+          RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Window} }}"
+                CommandParameter="{Binding Path=Content, RelativeSource={RelativeSource Mode=TemplatedParent}}">
+          <materialDesign:PackIcon Kind="Delete"/>
+        </Button>
+        
+        <ComboBox Width="100"
+                      ItemsSource="{Binding Path=DataContext.Countries, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}}"
+                      x:Name="burthCountriesDropdown" 
+                      DisplayMemberPath="Title"
+                      IsEditable="True" IsTextSearchEnabled="True"
+                      Margin="0 5 5 5"
+                      materialDesign:HintAssist.Hint="Страна"
+                      VerticalAlignment="Bottom"
+                      VirtualizingStackPanel.VirtualizationMode="Recycling" 
+                      VirtualizingStackPanel.IsVirtualizing="True" 
+                      >
+          <ComboBox.ItemsPanel>
+            <ItemsPanelTemplate>
+              <VirtualizingStackPanel/>
+            </ItemsPanelTemplate>
+          </ComboBox.ItemsPanel>
+        </ComboBox>
+        <TextBox
+          materialDesign:HintAssist.Hint="Город"
+          Text="{Binding Location.City}"
+          Margin="5 5 5 5"
+          Width="90"
+          VerticalAlignment="Bottom" OverridesDefaultStyle="True"/>
+
+        <DatePicker materialDesign:HintAssist.Hint="Начало" 
+                    SelectedDate="{Binding From, Mode=TwoWay}"
+                    VerticalAlignment="Bottom" Margin="5 5 5 5" Width="80"></DatePicker>
+        <DatePicker Margin="5 5 5 5" Width="80" materialDesign:HintAssist.Hint="Конец"
+                    SelectedDate="{Binding To, Mode=TwoWay}" VerticalAlignment="Bottom"></DatePicker>
+      </StackPanel>
+    </DataTemplate>
+    <Style TargetType="TextBox" BasedOn ="{StaticResource MaterialDesignFloatingHintTextBox}">
+      <Setter Property="Width" Value="200"></Setter>
+      <Setter Property="Margin" Value="0 10 0 10"></Setter>
+    </Style>
+    
+    <BooleanToVisibilityConverter x:Key="b2v"/>
+    <converters:FromBoolToMaleSexConverter x:Key="b2m"/>
+    <converters:FromBoolToFemaleSexConverter x:Key="b2f"/>
+  </Window.Resources>
+  
+  <Grid>
+    <Grid.RowDefinitions>
+      <RowDefinition Height="6*"/>
+      
+      <RowDefinition/>
+    </Grid.RowDefinitions>
+    
+    <ScrollViewer ScrollViewer.VerticalScrollBarVisibility="Visible" Grid.Row="0" >
+      <StackPanel>
+        <Expander x:Name="mainInfo" Header="Основная информация" IsExpanded="True" 
+                  DataContext="{Binding Person.MainInfo}">
+          <StackPanel>
+            <StackPanel x:Name="sex" Orientation="Horizontal" HorizontalAlignment="Center">
+              <TextBlock Margin="5 15 5 15">Мужчина:</TextBlock>
+              
+              <RadioButton Margin="5 15 5 15" GroupName="sex" 
+                           IsChecked="{Binding Sex, Converter={StaticResource b2m}}" />
+              
+              <TextBlock Margin="15 15 5 15">Женщина:</TextBlock>
+              
+              <RadioButton Margin="5 15 15 15" GroupName="sex" x:Name="womanRadioButton"
+                           IsChecked="{Binding Sex, Converter={StaticResource b2f}}"/>
+            </StackPanel>
+
+            <TextBox materialDesign:HintAssist.Hint="Фамилия" materialDesign:HintAssist.HintOpacity=".35">
+              <TextBox.Text>
+                <Binding Path="LastName" Delay="100" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
+                  <Binding.ValidationRules>
+                    <validation:OnlyCharsValidationRule/>
+                    <validation:TextFieldLengthRangeValidationRule/>
+                  </Binding.ValidationRules>
+                </Binding>
+              </TextBox.Text>
+            </TextBox>
+
+            <TextBox materialDesign:HintAssist.Hint="Девичья фамилия"
+                     materialDesign:HintAssist.HintOpacity=".35"
+                     Visibility="{Binding ElementName=womanRadioButton, Path=IsChecked, 
+                     Converter={StaticResource b2v}}"
+                     Text="{Binding MaidenName, Delay=300, Mode=TwoWay}">
+            </TextBox>
+            
+            <TextBox materialDesign:HintAssist.Hint="Имя"
+                     materialDesign:HintAssist.HintOpacity=".35"
+                     Text="{Binding Name, Delay=300, Mode=TwoWay}">
+            </TextBox>
+
+
+            <TextBox materialDesign:HintAssist.Hint="Отчество"
+                     materialDesign:HintAssist.HintOpacity=".35"
+                     Text="{Binding Patronymic, Delay=300, Mode=TwoWay}"
+                     Visibility="{Binding Person.MainInfo.Sex}">
+            </TextBox>
+          </StackPanel>
+        </Expander>
+
+        <Expander x:Name="burthInfo" Header="Информация о рождении">
+          <StackPanel>
+
+            <DatePicker FontSize="14" Width="200" materialDesign:HintAssist.Hint="Дата рождения"
+                        materialDesign:HintAssist.HintOpacity=".35" 
+                        SelectedDate="{Binding Person.BurthInfo.BurthDate, Mode=TwoWay}"
+                        />
+
+            <TextBlock Margin="0 15 0 0" HorizontalAlignment="Center" Text="Место рождения"></TextBlock>
+
+            <ComboBox Width="200" Margin="0 15 0 15"
+                      x:Name="burthCountriesDropdown" 
+                      ItemsSource="{Binding Countries}" 
+                      DisplayMemberPath="Title"
+                      IsEditable="True" IsTextSearchEnabled="True"
+                      materialDesign:HintAssist.Hint="Страна"
+                      materialDesign:HintAssist.HintOpacity=".35"
+                      VirtualizingStackPanel.VirtualizationMode="Recycling" 
+                      VirtualizingStackPanel.IsVirtualizing="True" 
+                      SelectedItem="{Binding Person.BurthInfo.BurthLocation.Country, Mode=TwoWay}"
+                      >
+              <ComboBox.ItemsPanel>
+                <ItemsPanelTemplate>
+                  <VirtualizingStackPanel/>
+                </ItemsPanelTemplate>
+              </ComboBox.ItemsPanel>
+            </ComboBox>
+            
+            <TextBox Width="200" x:Name="burthCitiesDropdown" 
+                      Text="{Binding Path=Person.BurthInfo.BurthLocation.City, UpdateSourceTrigger=PropertyChanged, Delay=200}"
+                      materialDesign:HintAssist.Hint="Город (Населённый пункт)" 
+                      materialDesign:HintAssist.HintOpacity=".35"/>
+            
+            <TextBox x:Name="burthStreet" materialDesign:HintAssist.Hint="Улица"
+                     materialDesign:HintAssist.HintOpacity=".35"
+                     Text="{Binding Person.BurthInfo.BurthLocation.Street, Mode=TwoWay}"></TextBox>
+
+            <TextBox x:Name="burthHouseNumber" materialDesign:HintAssist.Hint="Номер дома"
+                     materialDesign:HintAssist.HintOpacity=".35"
+                     Text="{Binding Person.BurthInfo.BurthLocation.HouseNumber, Mode=TwoWay}"/>
+
+            <TextBox x:Name="burthFlatNumber" materialDesign:HintAssist.Hint="Номер квартиры"
+                     materialDesign:HintAssist.HintOpacity=".35"
+                     Text="{Binding Person.BurthInfo.BurthLocation.FlatNumber, Mode=TwoWay}"/>
+          </StackPanel>
+        </Expander>
+
+        <Expander x:Name="deathInfo" Header="Информация о смерти">
+          <StackPanel>
+            <DatePicker FontSize="16" Width="200" materialDesign:HintAssist.Hint="Дата смерти" 
+                      materialDesign:HintAssist.HintOpacity=".35"
+                      SelectedDate="{Binding Person.DeathInfo.DeathDate, Mode=TwoWay}"/>
+
+            <CheckBox HorizontalAlignment="Center" Margin="0 10 0 15"
+                      IsChecked="{Binding Person.DeathInfo.IsApproximateDate, Mode=TwoWay}"
+                      Content="Является ли дата приблизительной"/>
+
+            <TextBlock HorizontalAlignment="Center" Margin="0 20 0 10">Место смерти</TextBlock>
+
+            <ComboBox Width="200" Margin="0 15 0 15" x:Name="deathCountriesDropdown" 
+                      DisplayMemberPath="Title" IsEditable="True" 
+                      IsTextSearchEnabled="True" ItemsSource="{Binding Countries}"
+                      materialDesign:HintAssist.Hint="Страна"
+                      materialDesign:HintAssist.HintOpacity=".35"
+                      VirtualizingStackPanel.VirtualizationMode="Recycling"
+                      VirtualizingStackPanel.IsVirtualizing="True"
+                      SelectedItem="{Binding Person.DeathInfo.DeathLocation.Country}">
+              <ComboBox.ItemsPanel>
+                <ItemsPanelTemplate>
+                  <VirtualizingStackPanel/>
+                </ItemsPanelTemplate>
+              </ComboBox.ItemsPanel>
+            </ComboBox>
+
+            <TextBox Width="200" materialDesign:HintAssist.Hint="Город (Населённый пункт)"
+                     materialDesign:HintAssist.HintOpacity=".35"
+                     Text="{Binding Person.DeathInfo.DeathLocation.City, UpdateSourceTrigger=PropertyChanged}"/>
+          </StackPanel>
+        </Expander>
+
+        <Expander x:Name="educationInfo" Header="Образование">
+          <Grid>
+            <Grid.ColumnDefinitions>
+              <ColumnDefinition Width="*"/>
+              <ColumnDefinition Width="4*"/>
+            </Grid.ColumnDefinitions>
+
+            <Button Grid.Column="0" Width="30" Height="30" VerticalAlignment="Center"
+                    Margin="5 13 5 5" Padding="0"
+                    Style="{StaticResource MaterialDesignFloatingActionMiniAccentButton}"
+                    Command="{Binding AddEducationRecordCommand}">
+              <materialDesign:PackIcon Kind="Add"/>
+            </Button>
+
+            <ItemsControl ItemTemplate="{StaticResource educationsInput}"
+                          ItemsSource="{Binding Person.Educations}" Grid.Column="1">
+            
+            </ItemsControl>
+          </Grid>
+        </Expander>
+
+        <Expander x:Name="residencePlaces" Header="Места жительства">
+          <Grid>
+            <Grid.ColumnDefinitions>
+              <ColumnDefinition Width="*"/>
+              <ColumnDefinition Width="4*"/>
+            </Grid.ColumnDefinitions>
+
+            <Button Grid.Column="0" Width="30" Height="30" VerticalAlignment="Center"
+                    Margin="5 13 5 5" Padding="0"
+                    Style="{StaticResource MaterialDesignFloatingActionMiniAccentButton}"
+                    Command="{Binding AddResidenceRecordCommand}">
+              <materialDesign:PackIcon Kind="Add"/>
+            </Button>
+
+            <StackPanel Grid.Column="1">
+            <ItemsControl ItemTemplate="{StaticResource residencceInput}" 
+                          ItemsSource="{Binding Person.Residences, Mode=TwoWay}">
+            </ItemsControl>
+            </StackPanel>
+          </Grid>
+        </Expander>
+
+        <Expander Header="Дополнительная информация" x:Name="additionalInfo">
+          <StackPanel>
+            <TextBox materialDesign:HintAssist.Hint="Национальность"
+                     materialDesign:HintAssist.HintOpacity=".35"
+                     Text="{Binding Person.AdditionalInfo.Nationality, Mode=TwoWay}"/>
+
+            <TextBox materialDesign:HintAssist.Hint="Социальный статус"
+                     materialDesign:HintAssist.HintOpacity=".35"
+                     Text="{Binding Person.AdditionalInfo.SocialStatus, Mode=TwoWay}"/>
+
+            <Grid HorizontalAlignment="Center">
+              <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="5*"/>
+              </Grid.ColumnDefinitions>
+
+              <Button   Grid.Column="0"
+                        Command="{Binding AddProfessionRecordCommand}"
+                        Width="30" Height="30"                    
+                        Margin="25" Padding="0"
+                        VerticalAlignment="Center"
+                        Style="{StaticResource MaterialDesignFloatingActionMiniAccentButton}" >
+                <materialDesign:PackIcon Kind="Add"/>
+              </Button>
+
+              <ItemsControl Grid.Column="1" ItemsSource="{Binding Person.AdditionalInfo.Professions}">
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate>
+                    <StackPanel Orientation="Horizontal">
+
+                      <Button Command="{Binding Path=DataContext.DeleteProfessionCommand,
+                              RelativeSource={RelativeSource Mode=FindAncestor, 
+                              AncestorType={x:Type Window} }}"                              
+                              CommandParameter="{Binding Path=Content, 
+                              RelativeSource={RelativeSource Mode=TemplatedParent}}"
+                              VerticalAlignment="Bottom"
+                              Margin="0 15 10 5 "
+                              Width="25" Height="25"
+                              Style="{StaticResource MaterialDesignFloatingActionMiniButton}">
+                        <materialDesign:PackIcon Kind="Delete"/>
+                      </Button>
+
+                      <TextBox materialDesign:HintAssist.Hint="Профессия" 
+                                 materialDesign:HintAssist.HintOpacity=".35"
+                                 Margin="0 0 115 0"
+                               Text="{Binding Mode=TwoWay, Path=Title}"/>
+
+                    </StackPanel>
+                  </DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
+            </Grid>
+
+            <TextBox x:Name="howDataWasObtained" materialDesign:HintAssist.Hint="Как была получена информация"
+                     materialDesign:HintAssist.HintOpacity=".35"
+                     Style="{StaticResource MaterialDesignOutlinedTextFieldTextBox}" 
+                     Width="300" Margin="10 20 10 30"
+                     TextWrapping="Wrap" materialDesign:HintAssist.FloatingScale="0.5" FontSize="15"
+                     Text="{Binding Person.AdditionalInfo.HowInformationWasObtained, Mode=TwoWay}"/>
+
+            <TextBox x:Name="lifeDetails"
+                 Style="{StaticResource MaterialDesignOutlinedTextFieldTextBox}" 
+                 Width="300" Margin="10 20 10 30" 
+                 Text="{Binding Person.AdditionalInfo.LifeDetails, Mode=TwoWay}"
+                 TextWrapping="Wrap" materialDesign:HintAssist.FloatingScale="0.5"
+                 materialDesign:HintAssist.Hint="Подробности жизни"  
+                 materialDesign:HintAssist.HintOpacity=".35" FontSize="14"/>
+          </StackPanel>
+        </Expander>
+
+      </StackPanel>
+    </ScrollViewer>
+    
+    <Button  Grid.Row="1" HorizontalAlignment="Center" CommandParameter="{Binding ElementName=Window}"
+             Command="{Binding AddRecordCommand}">
+      <StackPanel Orientation="Horizontal">
+        <materialDesign:PackIcon Kind="PersonAdd" Margin="5 5 5 5" FontSize="14"/>
+
+        <TextBlock Padding="10 0 10 0" FontSize="14" VerticalAlignment="Center" Text="Применить"/>
+      </StackPanel>
+    </Button>
+    
+    </Grid>
+</Window>
